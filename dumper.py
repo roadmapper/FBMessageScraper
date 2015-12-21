@@ -1,5 +1,8 @@
 # This code is a fork of of Raghav Sood's 2014 script, hosted on https://github.com/RaghavSood/FBMessageScraper
 # Changes compared to commit 4e3f268:
+# * Uses configuration files instead of hardcoded values
+# * Fixed a bug detecting the end_of_history mark
+# * Fixed a bug downloading the latest messages
 
 import urllib2
 import urllib
@@ -35,8 +38,8 @@ except:
 messages = []
 talk = sys.argv[2]
 offset = int(sys.argv[4]) if len(sys.argv) >= 5 else int("0")
-messages_data = "lolno"
-end_mark = "\"payload\":{\"end_of_history\""
+messages_data = '{ "payload" : "empty"}'
+json_end_record = "end_of_history"
 limit = int(sys.argv[3])
 headers = {"origin": "https://www.facebook.com", 
 "accept-encoding": "gzip,deflate", 
@@ -48,11 +51,10 @@ headers = {"origin": "https://www.facebook.com",
 "accept": "*/*", 
 "cache-control": "no-cache", 
 "referer": "https://www.facebook.com/messages/zuck"}
-
 base_directory = "Messages/"
 directory = base_directory + str(talk) + "/"
 pretty_directory = base_directory + str(talk) + "/Pretty/"
-
+fringe_message_timestamp = 0
 try:
 	os.makedirs(directory)
 except OSError:
@@ -63,17 +65,18 @@ try:
 except OSError:
 	pass # already exists
 
-while end_mark not in messages_data:
+while json_end_record not in json.loads(messages_data)["payload"]: # see if the JSON has a json_end_record key
 	data_text = {"messages[user_ids][" + str(talk) + "][offset]": str(offset),
-	"messages[user_ids][" + str(talk) + "][limit]": str(limit),
-	"client": "web_messenger",
-	"__user": config["user"],
-	"__a": config["a"],
-	"__dyn": config["dyn"],
-	"__req": config["req"],
-	"fb_dtsg": config["fb_dtsg"],
-	"ttstamp": config["ttstamp"],
-	"__rev": config["rev"]}
+				 "messages[user_ids][" + str(talk) + "][timestamp]": fringe_message_timestamp,
+				 "messages[user_ids][" + str(talk) + "][limit]": str(limit),
+				 "client": "web_messenger",
+				 "__user": config["user"],
+				 "__a": config["a"],
+				 "__dyn": config["dyn"],
+				 "__req": config["req"],
+				 "fb_dtsg": config["fb_dtsg"],
+				 "ttstamp": config["ttstamp"],
+				 "__rev": config["rev"]}
 	data = urllib.urlencode(data_text)
 	url = "https://www.facebook.com/ajax/mercury/thread_info.php"
 
@@ -90,7 +93,12 @@ while end_mark not in messages_data:
 	json_data = json.loads(messages_data)
 	if json_data is not None and json_data['payload'] is not None:
 		try:
-			messages = messages + json_data['payload']['actions']
+			if not messages: # if this is the first batch, insert the whole thing
+				messages = json_data['payload']['actions']
+			else:
+				messages = json_data['payload']['actions'][:-1] + messages # if this isn't the first batch, the final
+																	# message was already there in the previous batch
+			fringe_message_timestamp = json_data['payload']['actions'][0]['timestamp']
 		except KeyError:
 			pass #no more messages
 	else:
