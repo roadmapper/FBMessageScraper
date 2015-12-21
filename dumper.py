@@ -1,3 +1,6 @@
+# This code is a fork of of Raghav Sood's 2014 script, hosted on https://github.com/RaghavSood/FBMessageScraper
+# Changes compared to commit 4e3f268:
+
 import urllib2
 import urllib
 import gzip
@@ -17,23 +20,28 @@ __email__ = "raghavsood@appaholics.in"
 __status__ = "Production"
 
 if len(sys.argv) <= 1:
-	print "Usage:\n 	python dumper.py [conversation ID] [chunk_size (recommended: 2000)] [{optional} offset location (default: 0)]"
+	print "Usage:\n 	python dumper.py [config file] [conversation ID] [chunk_size (recommended: 2000)] [{optional} offset location (default: 0)]"
 	print "Example conversation with Raghav Sood"
 	print "	python dumper.py 1075686392 2000 0"
 	sys.exit()
 
-error_timeout = 30 # Change this to alter error timeout (seconds)
-general_timeout = 7 # Change this to alter waiting time afetr every request (seconds)
+try:
+	with open(sys.argv[1], 'r+') as infile:
+		config = json.load(infile)
+except:
+	print "Failed to load configuration. Did you specify a proper configuration JSON?"
+	sys.exit()
+
 messages = []
-talk = sys.argv[1]
-offset = int(sys.argv[3]) if len(sys.argv) >= 4 else int("0")
+talk = sys.argv[2]
+offset = int(sys.argv[4]) if len(sys.argv) >= 5 else int("0")
 messages_data = "lolno"
 end_mark = "\"payload\":{\"end_of_history\""
-limit = int(sys.argv[2])
+limit = int(sys.argv[3])
 headers = {"origin": "https://www.facebook.com", 
 "accept-encoding": "gzip,deflate", 
 "accept-language": "en-US,en;q=0.8", 
-"cookie": "your_cookie_value", 
+"cookie": config["cookie"],
 "pragma": "no-cache", 
 "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.122 Safari/537.36", 
 "content-type": "application/x-www-form-urlencoded", 
@@ -56,27 +64,26 @@ except OSError:
 	pass # already exists
 
 while end_mark not in messages_data:
-
-	data_text = {"messages[user_ids][" + str(talk) + "][offset]": str(offset), 
-	"messages[user_ids][" + str(talk) + "][limit]": str(limit), 
-	"client": "web_messenger", 
-	"__user": "your_user_id", 
-	"__a": "your __a", 
-	"__dyn": "your __dyn", 
-	"__req": "your __req", 
-	"fb_dtsg": "your_fb_dtsg", 
-	"ttstamp": "your_ttstamp", 
-	"__rev": "your __rev"}
+	data_text = {"messages[user_ids][" + str(talk) + "][offset]": str(offset),
+	"messages[user_ids][" + str(talk) + "][limit]": str(limit),
+	"client": "web_messenger",
+	"__user": config["user"],
+	"__a": config["a"],
+	"__dyn": config["dyn"],
+	"__req": config["req"],
+	"fb_dtsg": config["fb_dtsg"],
+	"ttstamp": config["ttstamp"],
+	"__rev": config["rev"]}
 	data = urllib.urlencode(data_text)
 	url = "https://www.facebook.com/ajax/mercury/thread_info.php"
-	
+
 	print "Retrieving messages " + str(offset) + "-" + str(limit+offset) + " for conversation ID " + str(talk)
 	req = urllib2.Request(url, data, headers)
 	response = urllib2.urlopen(req)
 	compressed = StringIO.StringIO(response.read())
 	decompressedFile = gzip.GzipFile(fileobj=compressed)
-	
-	
+
+
 	outfile = open(directory + str(offset) + "-" + str(limit+offset) + ".json", 'w')
 	messages_data = decompressedFile.read()
 	messages_data = messages_data[9:]
@@ -87,17 +94,17 @@ while end_mark not in messages_data:
 		except KeyError:
 			pass #no more messages
 	else:
-		print "Error in retrieval. Retrying after " + str(error_timeout) + "s"
+		print "Error in retrieval. Retrying after " + str(config["error_timeout"]) + "s"
 		print "Data Dump:"
 		print json_data
-		time.sleep(error_timeout)
+		time.sleep(config["error_timeout"])
 		continue
 	outfile.write(messages_data)
-	outfile.close()	
+	outfile.close()
 	command = "python -mjson.tool " + directory + str(offset) + "-" + str(limit+offset) + ".json > " + pretty_directory + str(offset) + "-" + str(limit+offset) + ".pretty.json"
 	os.system(command)
 	offset = offset + limit
-	time.sleep(general_timeout) 
+	time.sleep(config["general_timeout"])
 
 finalfile = open(directory + "complete.json", 'wb')
 finalfile.write(json.dumps(messages))

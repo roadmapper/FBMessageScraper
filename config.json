@@ -1,0 +1,12 @@
+{
+  "cookie": "<enter cookie here>",
+  "user": "<your facebook user id (10 characters)>",
+  "a" : "<ex. 1, use string literal (not integer)>",
+  "dyn:" : "<long string of characters and numbers>"
+  "req" : "<single-character string>",
+  "my_fb_dtsg" : "<your fb_dtsg>",
+  "my_ttstamp" : "<your timestapm>",
+  "my_rev" : "<your rev>",
+  "error_timeout" : 30,
+  "general_timeout" : 7
+}
