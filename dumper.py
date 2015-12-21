@@ -54,7 +54,9 @@ headers = {"origin": "https://www.facebook.com",
 base_directory = "Messages/"
 directory = base_directory + str(talk) + "/"
 pretty_directory = base_directory + str(talk) + "/Pretty/"
-fringe_message_timestamp = 0
+fringe_message_timestamp = 0 # when extracting a [newer .. older] portion of one's message history, facebook requires:
+							 # -numeric id newer, -timestamp newer, -numeric id older, where numeric id newer is 0 for the
+							 # the newest message, 1 for the one before that, etc.
 try:
 	os.makedirs(directory)
 except OSError:
@@ -100,7 +102,7 @@ while json_end_record not in json.loads(messages_data)["payload"]: # see if the 
 																	# message was already there in the previous batch
 			fringe_message_timestamp = json_data['payload']['actions'][0]['timestamp']
 		except KeyError:
-			pass #no more messages
+			pass # no more messages
 	else:
 		print "Error in retrieval. Retrying after " + str(config["error_timeout"]) + "s"
 		print "Data Dump:"

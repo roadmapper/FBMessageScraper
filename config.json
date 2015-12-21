@@ -7,6 +7,10 @@
   "my_fb_dtsg" : "<your fb_dtsg>",
   "my_ttstamp" : "<your timestapm>",
   "my_rev" : "<your rev>",
+  "ids_dictionary" : {
+    "fbid:XXXXXXXXXX" : "first_user",
+    "fbid:XXXXXXXXXX" : "second_user"
+  },
   "error_timeout" : 30,
   "general_timeout" : 7
 }
