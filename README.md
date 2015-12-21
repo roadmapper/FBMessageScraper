@@ -1,3 +1,15 @@
+This is  a fork of the following repository: [https://github.com/RaghavSood/FBMessageScraper](https://github.com/RaghavSood/FBMessageScraper).
+
+Here's a changelog, as compared to that repository's commit 4e3f268:
+* This version now uses configuration files instead of hardcoded values
+* Fixed a bug detecting the end_of_history mark
+* Fixed a bug downloading the latest messages (these were probably caused by Facebook adjusting the format of their response JSONs)
+* Added a file text_printer.py to print the contents of the JSON dump.
+
+To use text_printer.py, do: `python text_printer.py {configuration_file}, {id}`. (Only do this after performing the steps in the original instructions.)
+
+Here follow the original instructions:
+
 Facebook Message Scraper
 ========================
 
@@ -29,10 +41,10 @@ You're now all set to start downloading messages.
 Downloading Messages
 ====================
 
-1. Get the conversation ID for those messages by opening [http://graph.facebook.com/{username-of-chat-partner}](http://graph.facebook.com/{username_of_chat_partner})
+1. Get the conversation ID for those messages by opening [http://graph.facebook.com/{username-of-chat-partner}](http://graph.facebook.com/{username_of_chat_partner}). *Edit. This method no longer works. Click on their profile picture, and check the URL. The last sequence of numbers (10 digits) is their Facebook ID.*
 2. Copy the `id` value from there
 3. For group conversations, the ID can be retrieved from the messages tab, as part of the URL. You must use `group_dumper.py` instead.
-4. Run the command `python dumper.py {id} 2000`, and put the value you retrieved for ID earlier
+4. Run the command `python dumper.py {id} 2000`, and put the value you retrieved for ID earlier. *Edit: Also specify a configuration file: the command will be: `python dumper.py {configuration file} {id} 2000`*
 
 Messages are saved by default to `Messages/{id}/`
 
