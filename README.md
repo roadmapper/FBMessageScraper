@@ -1,4 +1,4 @@
-This is  a fork of the following repository: [https://github.com/RaghavSood/FBMessageScraper](https://github.com/RaghavSood/FBMessageScraper).
+This is  a fork of the following repository: [https://github.com/RaghavSood/FBMessageScraper](https://github.com/RaghavSood/FBMessageScraper). As of December 21, 2015, this version works again. Additionally, I've also refactored the code.
 
 Here's a changelog, as compared to that repository's commit 4e3f268:
 * This version now uses configuration files instead of hardcoded values
