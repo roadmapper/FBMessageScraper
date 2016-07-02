@@ -1,3 +1,12 @@
+What is this?
+=============
+I thought it would be cool to see some metadata about this past year's Facebook group conversation with some friends.
+After playing with the ~160k messages, I came back with a few cool stats in the form of an infographic.
+
+Here is the link:
+https://drive.google.com/open?id=0BxDtYOW63iqkUDR5UXRHZW1tRWc
+
+Below is a README on using the actual scrapper to download your own Facebook messages.
 
 Facebook Message Scraper
 ========================
