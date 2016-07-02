@@ -55,17 +55,20 @@ try:
 except OSError:
 	pass # already exists
 
+new_timestamp = 0
+
 while end_mark not in messages_data:
 
-	data_text = {"messages[thread_fbids][" + str(talk) + "][offset]": str(offset), 
+	data_text = {"messages[thread_fbids][" + str(talk) + "][offset]": str(offset),
+	"messages[thread_fbids][" + str(talk) + "][timestamp]": str(new_timestamp), 
 	"messages[thread_fbids][" + str(talk) + "][limit]": str(limit), 
 	"client": "web_messenger", 
-	"__user": "your_user_id", 
+	"__user": "your __user", 
 	"__a": "your __a", 
 	"__dyn": "your __dyn", 
 	"__req": "your __req", 
-	"fb_dtsg": "your_fb_dtsg", 
-	"ttstamp": "your_ttstamp", 
+	"fb_dtsg": "your fb_dtsg", 
+	"ttstamp": "your ttstamp", 
 	"__rev": "your __rev"}
 	data = urllib.urlencode(data_text)
 	url = "https://www.facebook.com/ajax/mercury/thread_info.php"
@@ -83,7 +86,10 @@ while end_mark not in messages_data:
 	json_data = json.loads(messages_data)
 	if json_data is not None and json_data['payload'] is not None:
 		try:
+			new_timestamp = json_data['payload']['actions'][0]['timestamp']
 			messages = messages + json_data['payload']['actions']
+			if 'end_of_history' in json_data['payload']:
+				break
 		except KeyError:
 			pass #no more messages
 	else:
