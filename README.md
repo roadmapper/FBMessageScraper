@@ -1,12 +1,8 @@
 What is this?
 =============
-I thought it would be cool to see some metadata about this past year's Facebook group conversation with some friends.
-After playing with the ~160k messages, I came back with a few cool stats in the form of an infographic.
+I've wanted to see stats on messages that have been accrued in my Facebook group over the last 3 years. The forked repo provided inspiration to get the data I wanted from my group threads.
 
-Here is the link:
-https://drive.google.com/open?id=0BxDtYOW63iqkUDR5UXRHZW1tRWc
-
-Below is a README on using the actual scrapper to download your own Facebook messages.
+Below is a README on using the actual scraper to download your own Facebook messages.
 
 Facebook Message Scraper
 ========================
@@ -15,7 +11,7 @@ A simple python script to download the entire conversation from Facebook, not li
 
 Outputs the conversation in a JSON format, as well as the JSON for each individual chunk.
 
-This is  a fork of the following repository: [https://github.com/RaghavSood/FBMessageScraper](https://github.com/RaghavSood/FBMessageScraper). As of December 21, 2015, this version works again.
+This is a [https://github.com/Pavitheran/FBMessageScraper](fork) of the repo that has the original code.
 
 
 Initial Setup
@@ -53,12 +49,10 @@ Messages are saved by default to `Messages/{id}/`
 Disclaimer
 ============
 
-This is  a fork of the following repository: [https://github.com/RaghavSood/FBMessageScraper](https://github.com/RaghavSood/FBMessageScraper).
+This is a fork of the following repository: [https://github.com/RaghavSood/FBMessageScraper](https://github.com/RaghavSood/FBMessageScraper).
 
 Here's a changelog, as compared to that repository's commit 4e3f268:
 * This version now uses configuration files instead of hardcoded values
 * Fixed a bug detecting the end_of_history mark
 * Fixed a bug downloading the latest messages (these were probably caused by Facebook adjusting the format of their response JSONs)
 * Added a file text_printer.py to print the contents of the JSON dump.
-
-

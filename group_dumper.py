@@ -27,13 +27,14 @@ general_timeout = 7 # Change this to alter waiting time afetr every request (sec
 messages = []
 talk = sys.argv[1]
 offset = int(sys.argv[3]) if len(sys.argv) >= 4 else int("0")
+timestamp = int("0")
 messages_data = "lolno"
 end_mark = "\"payload\":{\"end_of_history\""
 limit = int(sys.argv[2])
 headers = {"origin": "https://www.facebook.com", 
 "accept-encoding": "gzip,deflate", 
 "accept-language": "en-US,en;q=0.8", 
-"cookie": "your_cookie_value", 
+"cookie": "<your-cookie-here>", 
 "pragma": "no-cache", 
 "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.122 Safari/537.36", 
 "content-type": "application/x-www-form-urlencoded", 
@@ -55,26 +56,24 @@ try:
 except OSError:
 	pass # already exists
 
-new_timestamp = 0
-
 while end_mark not in messages_data:
 
-	data_text = {"messages[thread_fbids][" + str(talk) + "][offset]": str(offset),
-	"messages[thread_fbids][" + str(talk) + "][timestamp]": str(new_timestamp), 
+	data_text = {"messages[thread_fbids][" + str(talk) + "][offset]": str(offset), 
 	"messages[thread_fbids][" + str(talk) + "][limit]": str(limit), 
+        "messages[thread_fbids]["+ str(talk) + "][timestamp]": str(timestamp),
 	"client": "web_messenger", 
-	"__user": "your __user", 
-	"__a": "your __a", 
-	"__dyn": "your __dyn", 
-	"__req": "your __req", 
-	"fb_dtsg": "your fb_dtsg", 
-	"ttstamp": "your ttstamp", 
-	"__rev": "your __rev"}
+	"__user": "<your-user-value>", 
+	"__a": "<your-a-value>", 
+	"__dyn": "<your-dyn-value>", 
+	"__req": "<your-req-value>", 
+	"fb_dtsg": "<your-fb-dtsg>", 
+	"ttstamp": "<your-ttstamp>", 
+	"__rev": "<your-rev-value>"}
 	data = urllib.urlencode(data_text)
 	url = "https://www.facebook.com/ajax/mercury/thread_info.php"
 	
 	print "Retrieving messages " + str(offset) + "-" + str(limit+offset) + " for conversation ID " + str(talk)
-	req = urllib2.Request(url, data, headers)
+        req = urllib2.Request(url, data, headers)
 	response = urllib2.urlopen(req)
 	compressed = StringIO.StringIO(response.read())
 	decompressedFile = gzip.GzipFile(fileobj=compressed)
@@ -86,10 +85,13 @@ while end_mark not in messages_data:
 	json_data = json.loads(messages_data)
 	if json_data is not None and json_data['payload'] is not None:
 		try:
-			new_timestamp = json_data['payload']['actions'][0]['timestamp']
-			messages = messages + json_data['payload']['actions']
-			if 'end_of_history' in json_data['payload']:
-				break
+                        if not messages: # if this is the first batch, insert the whole thing
+				messages = json_data['payload']['actions']
+			else:
+				messages = json_data['payload']['actions'][:-1] + messages # if this isn't the first batch, the final message was already there in the previous batch
+                        if 'end_of_history' in json_data['payload']:
+                            break
+			timestamp = int(json_data['payload']['actions'][0]['timestamp']) - 1           
 		except KeyError:
 			pass #no more messages
 	else:
